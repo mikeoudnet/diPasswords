@@ -5,12 +5,13 @@ using System.Data;
 
 namespace diPasswords.Infrastructure.Data
 {
-    // Свернутые запросы к базам данных
-    // (нет нужды заново прописывать однообразный код)
+    /// <inheritdoc cref="IDataBaseManager"/>
+    // Collapsed databases requests
+    // (no neccessary to write same code)
     public class DataBaseManager : IDataBaseManager
     {
-        private ILogger _logger; // Связывание с логгингом
-        private string _connectionString; // Строка подключения к серверу БД
+        private ILogger _logger; // Linking to logging
+        private string _connectionString; // Connection database server string
 
         public DataBaseManager(ILogger logger, string connectionString = "Server=(localdb)\\mssqllocaldb;Database=master;Trusted_Connection=True;")
         {
@@ -18,7 +19,8 @@ namespace diPasswords.Infrastructure.Data
             _connectionString = connectionString;
         }
 
-        // Запрос без вывода
+        /// <inheritdoc cref="IDataBaseManager.Request(string, Dictionary{string, object}?)"/>
+        // Request without outputting
         public void Request(string commandString, Dictionary<string, object>? sqlInjetion = null)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -42,7 +44,8 @@ namespace diPasswords.Infrastructure.Data
                 }
             }
         }
-        // Запрос с чтением и выводом
+        /// <inheritdoc cref="IDataBaseManager.SelectData(string, Dictionary{string, object}?)"/>
+        // Request with user data reading and outputting
         public List<EncryptedData> SelectData(string commandString, Dictionary<string, object>? sqlInjetion = null)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -79,7 +82,7 @@ namespace diPasswords.Infrastructure.Data
                                 dataList.Add(data);
                             }
                         }
-                        else return null; //dataList.Add(new EncryptedData());
+                        else return null;
 
                         return dataList;
                     }
@@ -91,7 +94,8 @@ namespace diPasswords.Infrastructure.Data
                 }
             }
         }
-        // Запрос с чтением и выводом для логина и пароля пользователя
+        /// <inheritdoc cref="IDataBaseManager.SelectBaseData(string, Dictionary{string, object}?)"/>
+        // Request with base login and password reading and outputting
         public List<MasterData> SelectBaseData(string commandString, Dictionary<string, object>? sqlInjetion = null)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -134,7 +138,8 @@ namespace diPasswords.Infrastructure.Data
                 }
             }
         }
-        // Запрос с подсчетом по условию
+        /// <inheritdoc cref="IDataBaseManager.GetCount(string, Dictionary{string, object}?)"/>
+        // Request with counting
         public object GetCount(string commandString, Dictionary<string, object>? sqlInjetion = null)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))

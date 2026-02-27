@@ -2,13 +2,28 @@
 
 namespace diPasswords.Application.Interfaces
 {
-    // Отображение данных для данного пользователя
+    /// <summary>
+    /// User data visualization
+    /// </summary>
     public interface IDataListShower
     {
-        public event Action<List<Data>> OnList; // Связывание объекта с ListBox
-        public event Action<string> OnListCursor; // Установка курсора на выбранные данные
-
-        void UpdateList(List<Data> dataList); // Обновить вывод данных
-        public void SetDataCursor(string name); // Курсор на новые данные
+        /// <summary>
+        /// Object linking to the ListBox
+        /// </summary>
+        public event Action<List<Data>> OnList;
+        /// <summary>
+        /// Cursor setting to choosed data
+        /// </summary>
+        public event Action<string> OnListCursor;
+        /// <summary>
+        /// Data outputting updating
+        /// </summary>
+        /// <param name="dataList"></param>
+        void UpdateList(List<Data> dataList);
+        /// <summary>
+        /// Cursor setting to new data
+        /// </summary>
+        /// <param name="name"></param>
+        public void SetDataCursor(string name);
     }
 }

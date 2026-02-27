@@ -2,10 +2,12 @@
 
 namespace diPasswords.Application.Services
 {
-    // Проверка вводимых символов на соответствие локальным правилам
+    /// <inheritdoc cref="IValidator"/>
+    // Inputting symbols checking for local rules appropriating
     public class Validator : IValidator
     {
-        // Является ли вводимый символ допустимым
+        /// <inheritdoc cref="IValidator.IsKeyValid(char)"/>
+        // Valid key checking
         public bool IsKeyValid(char pressedKey)
         {
             if (pressedKey >= 'A' && pressedKey <= 'Z' || pressedKey >= 'a' && pressedKey <= 'z' || char.IsDigit(pressedKey) || pressedKey == '-' || pressedKey == '_' || char.IsControl(pressedKey))
@@ -15,7 +17,9 @@ namespace diPasswords.Application.Services
             else return false;
         }
 
-        public bool IsLoginCorrect(char keyPressed) // Является ли логин корректным
+        /// <inheritdoc cref="IValidator.IsLoginCorrect(char)"/>
+        // Correct login checking
+        public bool IsLoginCorrect(char keyPressed)
         {
             if (char.IsDigit(keyPressed)) return false;
             else return true;

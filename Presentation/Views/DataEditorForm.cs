@@ -5,17 +5,17 @@ namespace diPasswords.Presentation.Views
 {
     public partial class DataEditorForm : Form
     {
-        private string _baseLogin; // Логин пользователя, который редактирует данные
-        private bool _favorite = false; // Флажок "Избранное"
-        private string? _existingData; // Существуют ли эти данные или пользователь добавляет новые
+        private string _baseLogin; // Login of user, which edits data
+        private bool _favorite = false; // "Favorite" flag
+        private string? _existingData; // Do data exist or user adds new
 
-        private ILogger _logger; // Логгирование работы программы в отдельный элемент
-        private IDataValidator _dataValidator; // Проверка вводимых данных
-        private IDataService _dataService; // Взаимодействие с данными пользователя
-        private IDataListShower _dataListShower; // Отображение данных для данного пользователя
+        private ILogger _logger; // Logging to separate element
+        private IDataValidator _dataValidator; // Inputting data validation
+        private IDataService _dataService; // User data interaction
+        private IDataListShower _dataListShower; // User data visualization
 
-        // Отключение элементов при необходимости и изменение их параметров
-        // Привязка объектов к соответствующему элементу
+        // Element enabling by neccessary and their parameter edditing
+        // Objects linking to appropriate element
         private IElementController<Control> _showPasswordController;
 
         public DataEditorForm(
@@ -28,7 +28,7 @@ namespace diPasswords.Presentation.Views
         {
             InitializeComponent();
 
-            // Передача зависимостей
+            // Dependencies injection
             _baseLogin = baseLogin;            
             _logger = logger;
             _dataValidator = dataValidator;
@@ -39,10 +39,14 @@ namespace diPasswords.Presentation.Views
             _showPasswordController = new ElementController<Control>(ShowPasswordBttn, false, "Hide");
         }
 
-        // Когда форма открывается
+        /// <summary>
+        /// Load event on DataEditor form
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void DataEditorForm_Load(object sender, EventArgs e)
         {
-            // Если данные добавляются, фокус на TextBox для имени, иначе блок на этом TextBox
+            // If data are added, focus on name TextBox, else block it
             if (_existingData == null) this.ActiveControl = NameTextBox;
             else
             {
@@ -60,7 +64,11 @@ namespace diPasswords.Presentation.Views
             }
         }
 
-        // Если нажата кнопка "Добавить в избранное"
+        /// <summary>
+        /// Click event on "To favorite" button
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SetFavoriteBttn_Click(object sender, EventArgs e)
         {
             if (SetFavoriteBttn.Text == "☆")
@@ -77,7 +85,11 @@ namespace diPasswords.Presentation.Views
             }
         }
 
-        // Переключаем на следующее поле при нажатии на Enter
+        /// <summary>
+        /// KeyPress event on TextBox controls (switching to next field by [Enter] pressing)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void NameTextBox_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == '\r')
@@ -89,6 +101,9 @@ namespace diPasswords.Presentation.Views
                 }
             }
         }
+        /// <inheritdoc cref="DataEditorForm.NameTextBox_KeyPress(object, KeyPressEventArgs)"/>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void LoginTextBox_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == '\r')
@@ -100,6 +115,9 @@ namespace diPasswords.Presentation.Views
                 }
             }
         }
+        /// <inheritdoc cref="DataEditorForm.NameTextBox_KeyPress(object, KeyPressEventArgs)"/>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void PasswordTextBox_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == '\r')
@@ -111,6 +129,9 @@ namespace diPasswords.Presentation.Views
                 }
             }
         }
+        /// <inheritdoc cref="DataEditorForm.NameTextBox_KeyPress(object, KeyPressEventArgs)"/>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void EmailTextBox_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == '\r')
@@ -122,6 +143,9 @@ namespace diPasswords.Presentation.Views
                 }
             }
         }
+        /// <inheritdoc cref="DataEditorForm.NameTextBox_KeyPress(object, KeyPressEventArgs)"/>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void PhoneTextBox_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == '\r')
@@ -133,6 +157,9 @@ namespace diPasswords.Presentation.Views
                 }
             }
         }
+        /// <inheritdoc cref="DataEditorForm.NameTextBox_KeyPress(object, KeyPressEventArgs)"/>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void DescriptionTextBox_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == '\r')
@@ -142,7 +169,11 @@ namespace diPasswords.Presentation.Views
             }
         }
 
-        // Если нажата кнопка "Показать пароль"
+        /// <summary>
+        /// Click event on "Show password" button
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ShowPasswordBttn_Click(object sender, EventArgs e)
         {
             if (ShowPasswordBttn.Text == "Show")
@@ -156,14 +187,22 @@ namespace diPasswords.Presentation.Views
                 _showPasswordController.Retext(false);
             }
         }
-        // Если изменен текст в поле для пароля
+        /// <summary>
+        /// TextChanged event on password field
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void PasswordTextBox_TextChanged(object sender, EventArgs e)
         {
             if (PasswordTextBox.Text.Length > 0) _showPasswordController.Switch(true);
             else _showPasswordController.Switch(false);
         }
 
-        // Если нажата кнопка "Принять"
+        /// <summary>
+        /// Click event on "Accept" button
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void AcceptBttn_Click(object sender, EventArgs e)
         {
             if (_existingData == null)

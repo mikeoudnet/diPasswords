@@ -2,6 +2,9 @@
 
 namespace diPasswords.Domain.Models
 {
+    /// <summary>
+    /// Model of message level
+    /// </summary>
     public class LogEntry
     {
         public LogLevel level { get; set; }

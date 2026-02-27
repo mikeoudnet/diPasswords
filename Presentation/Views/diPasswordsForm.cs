@@ -6,22 +6,22 @@ using diPasswords.Presentation.Views;
 
 namespace diPasswords
 {
-    // Основная форма приложения (открывается при запуске)
+    // Common app form
     public partial class diPasswordsForm : Form
     {
-        private CurrentState _currentState = CurrentState.Authorizating; // Переменная хранения текущего статуса состояния UI
+        private CurrentState _currentState = CurrentState.Authorizating; // Value keeping current UI-state status
 
-        private ILogger _logger; // Логгирование работы программы в отдельный элемент
-        private IUserService _userService; // Взаимодействие с БД, отвечающей за существующих пользователей
-        private IValidator _validator; // Проверка вводимых символов на соответствие локальным правилам
-        private IElementView _elementView; // Включение/отключение пользовательских групп элементов
-        private IDataValidator _dataValidator; // Проверка вводимых данных
-        private IDataService _dataService; // Взаимодействие с данными пользователя
-        private IDataListShower _dataListShower; // Отображение данных для данного пользователя
-        private IEncrypter _encrypter; // Шифрование и дешифрование данных
+        private ILogger _logger; // Logging to separate element
+        private IUserService _userService; // Database working responsible for user logins and passwords keeping
+        private IValidator _validator; // Inputting symbols checking for local rules appropriating
+        private IElementView _elementView; // Class containging elements sets, neccessary to editting at the same time
+        private IDataValidator _dataValidator; // Inputting data validation
+        private IDataService _dataService; // User data interaction
+        private IDataListShower _dataListShower; // User data visualization
+        private IEncrypter _encrypter; // Data encrypting and decrypting
 
-        // Отключение элементов при необходимости и изменение их параметров
-        // Привязка объектов к соответствующему элементу
+        // Element enabling by neccessary and their parameter edditing
+        // Objects linking to appropriate element
         private IElementController<Control> _showBasePasswordController;
         private IElementController<Control> _enterBaseAccountController;
         private IElementController<Control> _addBaseAccountController;
@@ -35,14 +35,17 @@ namespace diPasswords
         private IElementController<Control> _baseLoginController;
         private IElementController<Control> _basePasswordController;
 
-        // Изменения состояний в зависимости от текущего сценария
+        /// <summary>
+        /// State changing depending on current script
+        /// </summary>
+        /// <param name="type"></param>
         private void Confirmition(CurrentState type)
         {
             _currentState = type;
             switch (type)
             {
-                case CurrentState.AddConfirming: // Подтверждение пароля при добавлении пользователя
-                case CurrentState.DeleteConfirming: // Подтверждение пароля при удалении пользователя
+                case CurrentState.AddConfirming: // Password confirming by user adding
+                case CurrentState.DeleteConfirming: // Passord confirming by user deleting
                     ClearPasswordField();
                     Deactivate();
 
@@ -51,8 +54,8 @@ namespace diPasswords
                     BasePasswordTextBox.PlaceholderText = "Confirm password";
 
                     break;
-                case CurrentState.Authorizating: // Сценарий авторизации пользователя
-                case CurrentState.LoggedIn: // Сценарий входа в аккаунт пользователя
+                case CurrentState.Authorizating: // User authorization script
+                case CurrentState.LoggedIn: // User logged in script
                     Deactivate();
 
                     if (type == CurrentState.Authorizating) _elementView.Switch(ElementMode.Authorization, false);
@@ -63,7 +66,7 @@ namespace diPasswords
                     if (type == CurrentState.Authorizating) ClearPasswordField();
 
                     break;
-                case CurrentState.BackToAuthorization: // Переключение с подтверждения пароля на авторизацию
+                case CurrentState.BackToAuthorization: // Password confirming switching to authorization
                     _currentState = CurrentState.Authorizating;
 
                     _elementView.Switch(ElementMode.Using, true);
@@ -73,7 +76,10 @@ namespace diPasswords
                     break;
             }
         }
-        // Вывод логов в ListView
+        /// <summary>
+        /// Log outputting to ListView
+        /// </summary>
+        /// <param name="logEntry"></param>
         private void ListViewLog(LogEntry logEntry)
         {
             ListViewItem item = new ListViewItem("[" + DateTime.Now.ToString() + "]: " + logEntry.message);
@@ -109,7 +115,10 @@ namespace diPasswords
             LoggerListView.Items.Add(item);
             item.EnsureVisible();
         }
-        // Обновление DataTextBox
+        /// <summary>
+        /// DataTextBox updating
+        /// </summary>
+        /// <param name="dataList"></param>
         private void ListBoxUpdate(List<Data> dataList)
         {
             DataListBox.Items.Clear();
@@ -125,17 +134,27 @@ namespace diPasswords
                 }
             }
         }
-        // Деактивировация кнопки "Показать пароль"
+        /// <summary>
+        /// Button "Show password" deactivating
+        /// </summary>
         public void Deactivate()
         {
             if (BasePasswordTextBox.PasswordChar == '\0') ShowBasePasswordBttn.PerformClick();
             ShowBasePasswordBttn.Enabled = false;
         }
-        // Установка фокуса ListBox на данные
+        /// <summary>
+        /// ListBox focus setting on the data
+        /// </summary>
+        /// <param name="name"></param>
         private void ListBoxFocus(string name) => DataListBox.SelectedIndex = DataListBox.Items.IndexOf(name);
-        // Очистка поля ввода пароля
+        /// <summary>
+        /// Password TextBox clearing
+        /// </summary>
         private void ClearPasswordField() => BasePasswordTextBox.Text = "";
-        // Отображение выбранных данных
+        /// <summary>
+        /// Chosed data visualization
+        /// </summary>
+        /// <param name="activate"></param>
         private void ShowSelectedData(bool activate)
         {
             if (activate)
@@ -164,7 +183,10 @@ namespace diPasswords
                 _showDataController.Retext(false);
             }
         }
-        // Преобразование выбранного элемента из ListBox в строку
+        /// <summary>
+        /// Choosed ListBox element transformation to string
+        /// </summary>
+        /// <returns></returns>
         private string ConvertSelected()
         {
             if (DataListBox.SelectedItem != null)
@@ -187,7 +209,7 @@ namespace diPasswords
         {
             InitializeComponent();
 
-            // Передача зависимостей
+            // Dependencies injection
             _logger = logger;
             _userService = userService;
             _validator = validator;
@@ -210,13 +232,13 @@ namespace diPasswords
             _baseLoginController = new ElementController<Control>(BaseLoginTextBox, true);
             _basePasswordController = new ElementController<Control>(BasePasswordTextBox, true);
 
-            // Добавление групп элементов            
+            // Elements group adding
             _elementView.AddPool
             (
                 ElementMode.Authorization, new ElementController<Control>(EnterBaseAccountBttn, false),
                 _addBaseAccountController,
                 _deleteBaseAccountController
-            ); // Изменяет состояние при непустых полях ввода логина и пароля
+            ); // Edits a state by non-empty login and password fields
             _elementView.AddPool
             (
                 ElementMode.Using, _enterBaseAccountController,
@@ -225,37 +247,41 @@ namespace diPasswords
                 _addDataController,
                 _baseLoginController,
                 _basePasswordController
-            ); // Изменяет состояние при успешной авторизации
+            ); // Edits a state by successful authorization
             _elementView.AddPool
             (
                 ElementMode.Adding, _addBaseAccountController
-            ); // Изменяет состояние во время подтверждения пароля при добавлении пользователя
+            ); // Edits a state for password confirming by user adding time
             _elementView.AddPool
             (
                 ElementMode.Deleting, _deleteBaseAccountController
-            ); // Изменяет состояние во время подтверждения пароля при удалении пользователя
+            ); // Edits a state for password confirming by user deleting time
             _elementView.AddPool
             (
                 ElementMode.DataSelected, new ElementController<Control>(ShowDataBttn, false),
                 _editDataController,
                 _deleteDataController
-            ); // Изменяет состояние при выбранном элементе в TextBox
+            ); // Edits a state by choosed element in TextBox
 
-            // Подписки на события объектов
+            // Objects events subscribings
             _logger.OnLog += ListViewLog;
             _dataListShower.OnList += ListBoxUpdate;
             _dataListShower.OnListCursor += ListBoxFocus;
 
             _logger.Info("Programm start");
 
-            _userService.CheckExisting(); // Создаем БД в случае, если это первый запуск программы
+            _userService.CreateDatabase(); // Creating database if this is first program start
             _logger.Info("Data base connection is successful");
         }
 
-        // При запуске данной формы
+        /// <summary>
+        /// Load event on diPassword form
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void diPasswords_Load(object sender, EventArgs e)
         {
-            // Если сохранен последний вошедший пользователь            
+            // If last user was saved
             if (Properties.Settings.Default.LastUsedLogin != null && Properties.Settings.Default.LastUsedLogin != "")
             {
                 BaseLoginTextBox.Text = Properties.Settings.Default.LastUsedLogin;
@@ -266,10 +292,14 @@ namespace diPasswords
             else this.ActiveControl = BaseLoginTextBox;
         }
 
-        // Если изменен текст в поле базового логина
+        /// <summary>
+        /// TextChanged event on base login field
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void BaseLoginTextBox_TextChanged(object sender, EventArgs e)
         {
-            if (_currentState != CurrentState.Authorizating) // Если активировано подтверждение пароля, деактивируем
+            if (_currentState != CurrentState.Authorizating) // If password confirming is activating, deactivate it
             {
                 BasePasswordTextBox.PlaceholderText = "";
                 _currentState = CurrentState.Authorizating;
@@ -280,7 +310,7 @@ namespace diPasswords
 
             if (BaseLoginTextBox.Text.Length > 0)
             {
-                if (BasePasswordTextBox.Text.Length > 0) // Если поля с логином и паролем одновременно не являются пустыми
+                if (BasePasswordTextBox.Text.Length > 0) // If login and password fields are non-empty at the same time
                 {
                     _elementView.Switch(ElementMode.Authorization, (_currentState == CurrentState.Authorizating) ? true : false);
                     _elementView.Switch(true);
@@ -288,7 +318,11 @@ namespace diPasswords
             }
             else _elementView.Switch(ElementMode.Authorization, false);
         }
-        // Если нажата клавиша в поле базового логина
+        /// <summary>
+        /// KeyPress event on base login field (here is going text validation)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void BaseLoginTextBox_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == '\r') this.ActiveControl = BasePasswordTextBox;
@@ -306,12 +340,16 @@ namespace diPasswords
             }
         }
 
-        // Если изменен текст в поле базового пароля
+        /// <summary>
+        /// TextChanged event on base password field
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void BasePasswordTextBox_TextChanged(object sender, EventArgs e)
         {
             if (BasePasswordTextBox.Text.Length > 0)
             {
-                if (BaseLoginTextBox.Text.Length > 0) // Если поля с логином и паролем одновременно не являются пустыми
+                if (BaseLoginTextBox.Text.Length > 0) // If login and password fields are non-empty at the same time
                 {
                     _elementView.Switch(ElementMode.Authorization, (_currentState == CurrentState.Authorizating) ? true : false);
                     _elementView.Switch(true);
@@ -325,7 +363,11 @@ namespace diPasswords
                 Deactivate();
             }
         }
-        // Если нажата клавиша в поле базового пароля
+        /// <summary>
+        /// KeyPress event on pase password field
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void BasePasswordTextBox_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == '\r')
@@ -343,10 +385,14 @@ namespace diPasswords
             }
         }
 
-        // Если нажата кнопка "Показать пароль"
+        /// <summary>
+        /// Click event on "Show password" button
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ShowBasePasswordBttn_Click(object sender, EventArgs e)
         {
-            if (ShowBasePasswordBttn.Text == "Show") // Если в данный момент пароль скрыт
+            if (ShowBasePasswordBttn.Text == "Show") // If the password is hidden now
             {
                 BasePasswordTextBox.PasswordChar = '\0';
                 _showBasePasswordController.Retext(true);
@@ -358,12 +404,16 @@ namespace diPasswords
             }
         }
 
-        // Если нажата кнопка "Ввести"
+        /// <summary>
+        /// Click event on "Enter" button
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void EnterBaseAccountBttn_Click(object sender, EventArgs e)
         {
-            if (_currentState == CurrentState.Authorizating) // Если пользователь еще не авторизовался
+            if (_currentState == CurrentState.Authorizating) // If a user is yet not authorizated
             {
-                if (_userService.IsPasswordCorrect(BaseLoginTextBox.Text, BasePasswordTextBox.Text)) // Проводится попытка подключения к соответствующей таблицу
+                if (_userService.IsPasswordCorrect(BaseLoginTextBox.Text, BasePasswordTextBox.Text)) // Trying to connect to appropriate table
                 {
                     _dataService.SetCurrentUser(BaseLoginTextBox.Text);
                     _encrypter.PasswordToKey(BasePasswordTextBox.Text);
@@ -398,20 +448,24 @@ namespace diPasswords
             }
         }
 
-        // Если нажата кнопка "Добавить пользователя"
+        /// <summary>
+        /// Click event on "Add user" button
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void AddBaseAccountBttn_Click(object sender, EventArgs e)
         {
             if (!_userService.IsUserExists(BaseLoginTextBox.Text))
             {
-                ConfirmitionState confirmer = _userService.Confirm(BasePasswordTextBox.Text); // Проверка на активированный режим подтверждения пароля
-                if (confirmer == ConfirmitionState.NotStarted) // Если подтверждение пароля неактивно, активируем
+                ConfirmitionState confirmer = _userService.Confirm(BasePasswordTextBox.Text); // Activating password confirming mode checking
+                if (confirmer == ConfirmitionState.NotStarted) // If password confirming is deactivated, activate it
                 {
                     Confirmition(CurrentState.AddConfirming);
 
                     _logger.Info("You need to confirm the password");
                     _logger.Info("You also can turn confirmition mode off by login editting");
                 }
-                else if (confirmer == ConfirmitionState.Confirmed) // Если пароль подтвержден
+                else if (confirmer == ConfirmitionState.Confirmed) // If the password is confirmed
                 {
                     _dataService.SetCurrentUser(BaseLoginTextBox.Text);
                     _encrypter.PasswordToKey(BasePasswordTextBox.Text);
@@ -439,20 +493,24 @@ namespace diPasswords
             }
         }
 
-        // Если нажата кнопка "Удалить пользователя"
+        /// <summary>
+        /// Click event on "Delete user" button
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void DeleteBaseAccountBttn_Click(object sender, EventArgs e)
         {
             if (_userService.IsPasswordCorrect(BaseLoginTextBox.Text, BasePasswordTextBox.Text))
             {
-                ConfirmitionState confirmer = _userService.Confirm(BasePasswordTextBox.Text); // Проверка на активированный режим подтверждения пароля
-                if (confirmer == ConfirmitionState.NotStarted) // Если подтверждение пароля неактивно, активируем
+                ConfirmitionState confirmer = _userService.Confirm(BasePasswordTextBox.Text); // Activating password confirming checking
+                if (confirmer == ConfirmitionState.NotStarted) // If the password confirming is deactivated, activate it
                 {
                     Confirmition(CurrentState.DeleteConfirming);
 
                     _logger.Info("You need to confirm the password");
                     _logger.Info("You also can turn confirmition mode off by login editting");
                 }
-                else if (confirmer == ConfirmitionState.Confirmed) // Если пароль подтвержден
+                else if (confirmer == ConfirmitionState.Confirmed) // If the password is confirmed
                 {
                     _userService.Delete(BaseLoginTextBox.Text, BasePasswordTextBox.Text);
                     Confirmition(CurrentState.Authorizating);
@@ -475,11 +533,15 @@ namespace diPasswords
         }
 
         // ----------------------------------------------------------------------------------------------------
-        // Начиная с этой строки и далее идут методы для работы с данными конкретного введенного пользователя
-        // (авторизация уже выполнена)
+        // Beginning this line and further described the methods for certain user data
+        // (authorization is already successful)
         // ----------------------------------------------------------------------------------------------------
 
-        // Если нажата кнопка "Добавить данные"
+        /// <summary>
+        /// Click event on "Show data" button
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void AddDataBttn_Click(object sender, EventArgs e)
         {
             DataEditorForm dataEditorForm = new DataEditorForm(
@@ -490,7 +552,11 @@ namespace diPasswords
                 _dataListShower);
             dataEditorForm.Show();
         }
-        // Если нажата кнопка "Изменить данные"
+        /// <summary>
+        /// Click event on "Edit data" button
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void EditDataBttn_Click(object sender, EventArgs e)
         {
             string name = ConvertSelected();
@@ -502,7 +568,11 @@ namespace diPasswords
                 name);
             dataEditorForm.Show();
         }
-        // Если нажата кнопка "Удалить данные"
+        /// <summary>
+        /// Click event on "Delete data" button
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void DeleteDataBttn_Click(object sender, EventArgs e)
         {
             string name = ConvertSelected();
@@ -520,7 +590,11 @@ namespace diPasswords
             }
         }
 
-        // Если выбран элемент в DataListBox
+        /// <summary>
+        /// SelectedIndexChanged event on DataListBox element
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void DataListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (DataListBox.SelectedItem != null)
@@ -534,25 +608,41 @@ namespace diPasswords
                 _showDataController.Retext(false);
             }
         }
-        // Если нажата кнопка "Показать данные"
+        /// <summary>
+        /// Click event on "Show data" button
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ShowDataBttn_Click(object sender, EventArgs e)
         {
             if (ShowDataBttn.Text == "Show data") ShowSelectedData(true);
             else ShowSelectedData(false);
         }
-        // Если пользователь нажимает Enter во время фокуса на элементе ListBox
+        /// <summary>
+        /// KeyPress event on DataListBox element (by [Enter] shows choosed data)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void DataListBox_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (DataListBox.SelectedItem != null && e.KeyChar == '\r') ShowDataBttn.PerformClick();
         }
-        // Если пользователь дважды нажимает на ListBox (делает то же, что и предыдущий метод)
+        /// <summary>
+        /// DoubleClick event on DataListBox element (do same as prior method)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void DataListBox_DoubleClick(object sender, EventArgs e)
         {
             if (DataListBox.SelectedItem != null) ShowDataBttn.PerformClick();
             else _elementView.Switch(ElementMode.DataSelected, false);
         }
 
-        // Копируем текст с соответствующих TextBox, если они не пустые
+        /// <summary>
+        /// MouseDown event on TextBox elements (copying putted text from approrriate field to the clipboard)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void DataLoginTextBox_MouseDown(object sender, MouseEventArgs e)
         {
             if (DataLoginTextBox.Text != "")
@@ -562,6 +652,9 @@ namespace diPasswords
                 _logger.Info("Login is copied");
             }
         }
+        /// <inheritdoc cref="diPasswordsForm.DataLoginTextBox_MouseDown(object, MouseEventArgs)"/>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void DataPasswordTextBox_MouseDown(object sender, MouseEventArgs e)
         {
             if (DataPasswordTextBox.Text != "")
@@ -571,6 +664,9 @@ namespace diPasswords
                 _logger.Info("Password is copied");
             }
         }
+        /// <inheritdoc cref="diPasswordsForm.DataLoginTextBox_MouseDown(object, MouseEventArgs)"/>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void DataEmailTextBox_MouseDown(object sender, MouseEventArgs e)
         {
             if (DataEmailTextBox.Text != "")
@@ -580,6 +676,9 @@ namespace diPasswords
                 _logger.Info("Email is copied");
             }
         }
+        /// <inheritdoc cref="diPasswordsForm.DataLoginTextBox_MouseDown(object, MouseEventArgs)"/>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void DataPhoneTextBox_MouseDown(object sender, MouseEventArgs e)
         {
             if (DataPhoneTextBox.Text != "")

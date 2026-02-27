@@ -11,6 +11,10 @@ namespace diPasswords
 {
     internal static class Program
     {
+        /// <summary>
+        /// Dependencies customization
+        /// </summary>
+        /// <param name="services"></param>
         private static void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<ILogger, Logger>();

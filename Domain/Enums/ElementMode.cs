@@ -1,6 +1,8 @@
 ﻿namespace diPasswords.Domain.Enums
 {
-    // Перечисление названий наборов элементов
+    /// <summary>
+    /// Names of elements sets enum
+    /// </summary>
     public enum ElementMode
     {
         None,

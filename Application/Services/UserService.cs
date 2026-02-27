@@ -1,23 +1,24 @@
 ﻿using diPasswords.Application.Interfaces;
 using diPasswords.Domain.Enums;
-using BCrypt.Net;
-using System.Diagnostics.Eventing.Reader;
 using diPasswords.Domain.Models;
 
 namespace diPasswords.Application.Services
 {
-    // Работа с базой данных, отвечающей за хранение логинов и паролей пользователей
+    /// <inheritdoc cref="IUserService"/>
+    // Database working responsible for user logins and passwords keeping
     public class UserService : IUserService
     {
-        private IDataBaseManager _dataBaseManager; // Свернутые запросы к базам данных
-        private string? _confirmer = null; // Пароль, который необходимо подтвердить
+        private IDataBaseManager _dataBaseManager; // Collapsed databases requests
+        private string? _confirmer = null; // Password to confirm it
 
         public UserService(IDataBaseManager dataBaseManager)
         {
             _dataBaseManager = dataBaseManager;
         }
-        // Проверить существование базы данных
-        public void CheckExisting()
+
+        /// <inheritdoc cref="IUserService.CreateDatabase()"/>
+        // Database creating, if it isn't yet created
+        public void CreateDatabase()
         {
             _dataBaseManager.Request
             (
@@ -55,7 +56,8 @@ namespace diPasswords.Application.Services
                 "END;"
             );
         }
-        // Проверка на совпадения пароля по пользователю
+        /// <inheritdoc cref="IUserService.IsPasswordCorrect(string, string)"/>
+        // Correct existing password checking
         public bool IsPasswordCorrect(string login, string password)
         {
             List<MasterData> data = _dataBaseManager.SelectBaseData
@@ -68,7 +70,7 @@ namespace diPasswords.Application.Services
                 }
             );
 
-            // Попытка сравнить пароли, если логин существует
+            // Trying to compare the passwords if login exists
             try
             {
                 if (BCrypt.Net.BCrypt.Verify(password, data[0].Password)) return true;
@@ -79,7 +81,8 @@ namespace diPasswords.Application.Services
                 return false;
             }
         }
-        // Добавить нового пользователя
+        /// <inheritdoc cref="IUserService.Add(string, string)"/>
+        // Adding new user
         public bool Add(string login, string password)
         {
             bool isLoginExists = Convert.ToBoolean(_dataBaseManager.GetCount
@@ -113,7 +116,8 @@ namespace diPasswords.Application.Services
             }
             else return false;
         }
-        // Существует ли данный пользователь
+        /// <inheritdoc cref="IUserService.IsUserExists(string)"/>
+        // User existing checking
         public bool IsUserExists(string login)
         {
             return Convert.ToBoolean(_dataBaseManager.GetCount
@@ -128,7 +132,8 @@ namespace diPasswords.Application.Services
                 }
             ));
         }
-        // Удалить данного пользователя
+        /// <inheritdoc cref="IUserService.Delete(string, string)"/>
+        // Deleting the user
         public bool Delete(string login, string password)
         {
             bool isUserCorrect = this.IsPasswordCorrect(login, password);
@@ -150,7 +155,8 @@ namespace diPasswords.Application.Services
             }
             else return false;
         }
-        // Подтвердить пароль пользователя
+        /// <inheritdoc cref="IUserService.Confirm(string?)"/>
+        // User password confirming
         public ConfirmitionState Confirm(string? text = null)
         {
             if (text != null)

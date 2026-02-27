@@ -1,6 +1,8 @@
 ﻿namespace diPasswords.Domain.Enums
 {
-    // Возможные уровни логгирования
+    /// <summary>
+    /// Possibl logging levels enum
+    /// </summary>
     public enum LogLevel
     {
         Info,

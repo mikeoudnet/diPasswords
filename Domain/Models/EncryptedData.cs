@@ -1,5 +1,8 @@
 ﻿namespace diPasswords.Domain.Models
 {
+    /// <summary>
+    /// Model of encrypted data from database
+    /// </summary>
     public class EncryptedData
     {
         public string Name { get; set; } = "";

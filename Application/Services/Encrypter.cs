@@ -5,14 +5,21 @@ using System.Text;
 
 namespace diPasswords.Application.Services
 {
-    // Шифрование и дешифрование данных
+    /// <inheritdoc cref="IEncrypter"/>
+    // Data encrypting and decrypting
     public class Encrypter : IEncrypter
     {
-        private byte[] _key = new byte[32]; // Ключ, использующий нехэшированный пароль пользователя для шифрования
+        private byte[] _key = new byte[32]; // Key using non-hashing user password for encrypting
 
-        private IDataBaseManager _dataBaseManager; // Свернутые запросы к базам данных
+        private IDataBaseManager _dataBaseManager; // Collapsed databases requests
 
-        // Шифрование строки по данному ключу и вектору иницализации
+        /// <summary>
+        /// String encrypting by key and IV
+        /// </summary>
+        /// <param name="plainText"></param>
+        /// <param name="key"></param>
+        /// <param name="iv"></param>
+        /// <returns></returns>
         private string EncryptString(string plainText, byte[] key, byte[] iv)
         {
             using (Aes aes = Aes.Create())
@@ -30,7 +37,13 @@ namespace diPasswords.Application.Services
                 }
             }
         }
-        // Дешифрование строки по данному ключу и вектору иницализации
+        /// <summary>
+        /// String decrypting by key and IV
+        /// </summary>
+        /// <param name="cipherText"></param>
+        /// <param name="key"></param>
+        /// <param name="iv"></param>
+        /// <returns></returns>
         private string DecryptString(string cipherText, byte[] key, byte[] iv)
         {
             using (Aes aes = Aes.Create())
@@ -52,13 +65,15 @@ namespace diPasswords.Application.Services
             _dataBaseManager = dataBaseManager;
         }
 
-        // Конвертирование текущего пароля в массив байтов
+        /// <inheritdoc cref="IEncrypter.PasswordToKey(string)"/>
+        // Current password converting to bytes array
         public void PasswordToKey(string password)
         {
             byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
             for (int i = 0; i < 32; i++) _key[i] = (i < password.Length) ? passwordBytes[i] : (byte)0;
         }
-        // Создание вектора инициализации и добавление его в базу данных
+        /// <inheritdoc cref="IEncrypter.SetIV(string)"/>
+        // Initialization vector and its adding to database
         public void SetIV(string name)
         {
             byte[] iv;
@@ -81,7 +96,8 @@ namespace diPasswords.Application.Services
                 }
             );
         }
-        // Кодировка модели данных
+        /// <inheritdoc cref="IEncrypter.Code(Data)"/>
+        // Data model coding
         public EncryptedData Code(Data data)
         {
             List<EncryptedData> findData = _dataBaseManager.SelectData
@@ -109,7 +125,8 @@ namespace diPasswords.Application.Services
             }
             else return null;
         }
-        // Декодировка модели зашифрованных данных
+        /// <inheritdoc cref="IEncrypter.Decode(EncryptedData)"/>
+        // Encrypted data model decoding
         public Data Decode(EncryptedData enData)
         {
             List<EncryptedData> findData = _dataBaseManager.SelectData

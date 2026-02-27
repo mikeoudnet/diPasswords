@@ -1,9 +1,21 @@
 ﻿namespace diPasswords.Application.Interfaces
 {
-    // Проверка вводимых символов на соответствие локальным правилам
+    /// <summary>
+    /// Inputting symbols checking for local rules appropriating
+    /// </summary>
     public interface IValidator
     {
-        bool IsKeyValid(char pressedKey); // Является ли вводимый символ допустимым
-        bool IsLoginCorrect(char pressedKey); // Является ли логин корректным
+        /// <summary>
+        /// Valid key checking
+        /// </summary>
+        /// <param name="pressedKey"></param>
+        /// <returns></returns>
+        bool IsKeyValid(char pressedKey);
+        /// <summary>
+        /// Correct login checking
+        /// </summary>
+        /// <param name="pressedKey"></param>
+        /// <returns></returns>
+        bool IsLoginCorrect(char pressedKey);
     }
 }

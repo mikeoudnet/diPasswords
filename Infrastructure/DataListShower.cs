@@ -2,15 +2,23 @@
 
 namespace diPasswords.Infrastructure
 {
-    // Отображение данных для данного пользователя
+    /// <inheritdoc cref="IDataBaseManager"/>
+    // Collapsed databases requests
+    // (no neccessary to write same code)
     public class DataListShower : IDataListShower
     {
-        public event Action<List<Domain.Models.Data>> OnList; // Связывание объекта с ListBox
-        public event Action<string> OnListCursor; // Установка курсора на выбранные данные
+        /// <inheritdoc cref="IDataListShower.OnList"/>
+        // Object linking to the ListBox
+        public event Action<List<Domain.Models.Data>> OnList;
+        /// <inheritdoc cref="IDataListShower.OnListCursor"/>
+        // Cursor setting to choosed data
+        public event Action<string> OnListCursor;
 
-        // Обновить вывод данных
+        /// <inheritdoc cref="IDataListShower.UpdateList(List{Domain.Models.Data})"/>
+        // Data outputting updating
         public void UpdateList(List<Domain.Models.Data> dataList) => OnList?.Invoke(dataList);
-        // Курсор на новые данные
+        /// <inheritdoc cref="IDataListShower.SetDataCursor(string)"/>
+        // Cursor setting to new data
         public void SetDataCursor(string name) => OnListCursor?.Invoke(name);
     }
 }

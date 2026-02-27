@@ -1,6 +1,8 @@
 ﻿namespace diPasswords.Domain.Enums
 {
-    // Перечисление текущих статусов состояния UI
+    /// <summary>
+    /// Currnet UI state statuses enum
+    /// </summary>
     public enum CurrentState
     {
         Authorizating,

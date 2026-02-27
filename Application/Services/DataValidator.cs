@@ -3,13 +3,14 @@ using System.Text.RegularExpressions;
 
 namespace diPasswords.Application.Services
 {
-    // Проверка вводимых данных
+    /// <inheritdoc cref="IDataValidator"/>
+    // Inputting data validation
     public class DataValidator : IDataValidator
     {
-        private readonly char[] _phoneSymbols = new char[] { '+', '-', '(', ')', ' ' }; // Допустимые символы при вводе номера телефона
+        private readonly char[] _phoneSymbols = new char[] { '+', '-', '(', ')', ' ' }; // Acceptable symbols by phone number inputting
 
-        private ILogger _logger; // Логгирование работы программы в отдельный элемент
-        private IDataBaseManager _dataBaseManager; // Свернутые запросы к базам данных
+        private ILogger _logger; // Logging to separate element
+        private IDataBaseManager _dataBaseManager; // Collapsed databases requests
 
         public DataValidator(
             ILogger logger,
@@ -19,7 +20,8 @@ namespace diPasswords.Application.Services
             _dataBaseManager = dataBaseManager;
         }
 
-        //// Является ли имя уникальным
+        /// <inheritdoc cref="IDataValidator.IsNameUnique(string, string)"/>
+        // Unique name checking
         public bool IsNameUnique(string baseLogin, string name)
         {
             {
@@ -58,7 +60,8 @@ namespace diPasswords.Application.Services
                 }
             }
         }
-        // Являются ли поля логина и пароля пустыми
+        /// <inheritdoc cref="IDataValidator.IsLoginAndPasswordNotEmpty(string, string)"/>
+        // Login and password checking (is it empty)
         public bool IsLoginAndPasswordNotEmpty(string login, string password)
         {
             if (login != "" && password != "") return true;
@@ -69,7 +72,8 @@ namespace diPasswords.Application.Services
                 return false;
             }
         }
-        // Введен ли e-mail корректно
+        /// <inheritdoc cref="IDataValidator.IsEmailCorrect(string)"/>
+        // Correct e-mail checking
         public bool IsEmailCorrect(string email)
         {
             string pattern = @"^[\w\.-_]+@[\w\.-]+\.\w+$";
@@ -82,7 +86,8 @@ namespace diPasswords.Application.Services
                 return false;
             }
         }
-        // Введен ли номер телефона корректно
+        /// <inheritdoc cref="IDataValidator.IsPhoneCorrect(string)"/>
+        // Correct phone number checking
         public bool IsPhoneCorrect(string phone)
         {
             foreach (char c in phone)

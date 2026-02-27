@@ -4,14 +4,15 @@ using Microsoft.Data.SqlClient;
 
 namespace diPasswords.Application.Services
 {
-    // Взаимодействие с данными пользователя
+    /// <inheritdoc cref="IDataService"/>
+    // User data interaction
     public class DataService : IDataService
     {
-        private string _baseLogin; // Текущий пользователь
+        private string _baseLogin; // Current user
 
-        private IDataBaseManager _dataBaseManager; // Свернутые запросы к базам данных
-        private ILogger _logger; // Логгирование работы программы в отдельный элемент
-        private IEncrypter _encrypter; // Шифрование и дешифрование данных
+        private IDataBaseManager _dataBaseManager; // Collapsed databases requests
+        private ILogger _logger; // Logging to separate element
+        private IEncrypter _encrypter; // Data encrypting and decrypting
 
         public DataService(IDataBaseManager dataBaseManager, ILogger logger, IEncrypter encrypter)
         {
@@ -20,9 +21,11 @@ namespace diPasswords.Application.Services
             _encrypter = encrypter;
         }
 
-        // Установить нынешнего пользователя
+        /// <inheritdoc cref="IDataService.SetCurrentUser(string)"/>
+        // Current user setting
         public void SetCurrentUser(string baseLogin) => _baseLogin = baseLogin;
-        // Добавить данные
+        /// <inheritdoc cref="IDataService.AddData(string, bool, string, string, string, string, string)"/>
+        // Adding new data
         public void AddData(string name, bool favorite, string login, string password, string email, string phone, string description)
         {
             if (_baseLogin != null)
@@ -43,7 +46,8 @@ namespace diPasswords.Application.Services
             }
             else _logger.Fatal("It is unknown whats user add data");
         }
-        // Изменить данные
+        /// <inheritdoc cref="IDataService.EditData(string, bool, string, string, string, string, string)"/>
+        // Edditting current data
         public void EditData(string name, bool favorite, string login, string password, string email, string phone, string description)
         {
             if (_baseLogin != null)
@@ -84,7 +88,8 @@ namespace diPasswords.Application.Services
                 );
             }
         }
-        // Удалить данные
+        /// <inheritdoc cref="IDataService.DeleteData(string)"/>
+        // Deleting the data
         public void DeleteData(string name)
         {
             _dataBaseManager.Request
@@ -98,7 +103,7 @@ namespace diPasswords.Application.Services
                 }
             );
         }
-        // Получить все данные пользователя
+        /// <inheritdoc cref="IDataService.GetData()"/>
         public List<Data> GetData()
         {
             List<EncryptedData> enDataList = _dataBaseManager.SelectData
@@ -120,7 +125,8 @@ namespace diPasswords.Application.Services
             }
             else return null;
         }
-        // Получить выбранные данные пользователя
+        /// <inheritdoc cref="IDataService.GetSelectedData(string)"/>
+        // All user data getting
         public Data GetSelectedData(string name)
         {
             List<EncryptedData> enDataList = _dataBaseManager.SelectData

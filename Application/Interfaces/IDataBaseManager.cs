@@ -2,13 +2,38 @@
 
 namespace diPasswords.Application.Interfaces
 {
-    // Свернутые запросы к базам данных
-    // (нет нужды заново прописывать однообразный код)
+    /// <summary>
+    /// Collapsed databases requests
+    /// (no neccessary to write same code)
+    /// </summary>
     public interface IDataBaseManager
     {
-        void Request(string commandString, Dictionary<string, object>? sqlInjetion = null); // Запрос без вывода
-        List<EncryptedData> SelectData(string commandString, Dictionary<string, object>? sqlInjetion = null); // Запрос с чтением и выводом
-        List<MasterData> SelectBaseData(string commandString, Dictionary<string, object>? sqlInjetion = null); // Запрос с чтением и выводом для логина и пароля пользователя
-        object GetCount(string commandString, Dictionary<string, object>? sqlInjetion = null); // Запрос с подсчетом по условию
+        /// <summary>
+        /// Request without outputting
+        /// </summary>
+        /// <param name="commandString"></param>
+        /// <param name="sqlInjetion"></param>
+        void Request(string commandString, Dictionary<string, object>? sqlInjetion = null);
+        /// <summary>
+        /// Request with user data reading and outputting
+        /// </summary>
+        /// <param name="commandString"></param>
+        /// <param name="sqlInjetion"></param>
+        /// <returns></returns>
+        List<EncryptedData> SelectData(string commandString, Dictionary<string, object>? sqlInjetion = null);
+        /// <summary>
+        /// Request with base login and password reading and outputting
+        /// </summary>
+        /// <param name="commandString"></param>
+        /// <param name="sqlInjetion"></param>
+        /// <returns></returns>
+        List<MasterData> SelectBaseData(string commandString, Dictionary<string, object>? sqlInjetion = null);
+        /// <summary>
+        /// Request with counting
+        /// </summary>
+        /// <param name="commandString"></param>
+        /// <param name="sqlInjetion"></param>
+        /// <returns></returns>
+        object GetCount(string commandString, Dictionary<string, object>? sqlInjetion = null);
     }
 }

@@ -1,10 +1,21 @@
 ﻿namespace diPasswords.Application.Interfaces
 {
-    // Отключение элементов при необходимости и изменение их параметров
-    // в зависимости от текущего состояния других элементов
+    /// <summary>
+    /// Element enabling by neccessary and their parameter edditing
+    /// Objects linking to appropriate element
+    /// </summary>
+    /// <typeparam name="T"></typeparam>    
     public interface IElementController<T>
     {
-        void Switch(bool? flag = null); // Включить/отключить элемент
-        void Retext(bool? flag = null); // Изменить текст элемента
+        /// <summary>
+        /// Switching on/off an element
+        /// </summary>
+        /// <param name="flag"></param>
+        void Switch(bool? flag = null);
+        /// <summary>
+        /// Element text switching
+        /// </summary>
+        /// <param name="flag"></param>
+        void Retext(bool? flag = null);
     }
 }

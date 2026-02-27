@@ -1,6 +1,8 @@
 ﻿namespace diPasswords.Domain.Enums
 {
-    // Перечисление статусов подтверждения пароля
+    /// <summary>
+    /// Statuses of passwords confirming enum
+    /// </summary>
     public enum ConfirmitionState
     {
         NotStarted,

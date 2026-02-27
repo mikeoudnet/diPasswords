@@ -2,14 +2,15 @@
 
 namespace diPasswords.Presentation.Managers
 {
-    // Отключение элементов при необходимости и изменение их параметров
-    // в зависимости от текущего состояния других элементов
+    /// <inheritdoc cref="IElementController{T}"/>
+    // Element enabling by neccessary and their parameters editting
+    // Objects linking to appropriate element
     public class ElementController<T> : IElementController<T> where T : Control
     {
-        private T _element; // Связывание объекта с элементом
-        private bool? _startStatus; // Изначальный статус элемента (null - установить текущий статус элемента)
-        private string _primaryText; // Исходный текст для кнопки
-        private string _secondaryText; // Дополнительный текст для кнопки
+        private T _element; // Object linking to element
+        private bool? _startStatus; // Primary element status (null - set current element status)
+        private string _primaryText; // Primary text for a button
+        private string _secondaryText; // Extra text for a button
 
         public ElementController(T element, bool? startStatus, string? secondaryText = null)
         {
@@ -20,14 +21,16 @@ namespace diPasswords.Presentation.Managers
             if (secondaryText != null) _secondaryText = secondaryText;
             else _secondaryText = _primaryText;
         }
-
-        // Включить/отключить элемент
+        
+        /// <inheritdoc cref="IElementController{T}.Switch(bool?)"/>
+        // Switching on/off an element
         public void Switch(bool? flag = null)
         {
             if (flag == null) _element.Enabled = !_element.Enabled;
             else if (_startStatus != null) _element.Enabled = (bool)_startStatus ? !(bool)flag : (bool)flag;
         }
-        // Изменить текст элемента
+        /// <inheritdoc cref="IElementController{T}.Retext(bool?)"/>
+        // Element text switching
         public void Retext(bool? flag = null)
         {
             if (_element.GetType() != typeof(TextBox))

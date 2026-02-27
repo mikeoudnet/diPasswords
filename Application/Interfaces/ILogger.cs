@@ -2,16 +2,41 @@
 
 namespace diPasswords.Application.Interfaces
 {
-    // Логгирование работы программы в отдельный элемент
-    // (в данном случае ListView)
+    /// <summary>
+    /// Logging to separate element
+    /// (for this time it is ListView)
+    /// </summary>
     public interface ILogger
     {
-        public event Action<LogEntry> OnLog; // Событие, связывающее логи и логгер
+        /// <summary>
+        /// An event linking logs and logger
+        /// </summary>
+        public event Action<LogEntry> OnLog;
 
-        void Info(string message); // Информирующее сообщение
-        void Warn(string message); // Предупреждающее сообщение
-        void Error(string message); // Сообщение об ошибке
-        void CurrentError(string message); // Сообщение об ошибке с выводом окна с ошибкой
-        void Fatal(string message); // Фатальная ошибка, обрывающая работы программы
+        /// <summary>
+        /// Informational message
+        /// </summary>
+        /// <param name="message"></param>
+        void Info(string message);
+        /// <summary>
+        /// Warning message
+        /// </summary>
+        /// <param name="message"></param>
+        void Warn(string message);
+        /// <summary>
+        /// Error message
+        /// </summary>
+        /// <param name="message"></param>
+        void Error(string message);
+        /// <summary>
+        /// Error message with MessageBox containing error information
+        /// </summary>
+        /// <param name="message"></param>
+        void CurrentError(string message);
+        /// <summary>
+        /// Fatal error message to finish whole program
+        /// </summary>
+        /// <param name="message"></param>
+        void Fatal(string message);
     }
 }

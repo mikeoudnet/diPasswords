@@ -2,14 +2,47 @@
 
 namespace diPasswords.Application.Interfaces
 {
-    // Работа с базой данных, отвечающей за хранение логинов и паролей пользователей
+    /// <summary>
+    /// Database working responsible for user logins and passwords keeping
+    /// </summary>
     public interface IUserService
     {
-        void CheckExisting(); // Проверить существование базы данных
-        bool IsPasswordCorrect(string login, string password); // Проверка на совпадения пароля по пользователю
-        bool Add(string login, string password); // Добавить нового пользователя
-        bool IsUserExists(string login); // Существует ли данный пользователь
-        bool Delete(string login, string password); // Удалить данного пользователя
-        ConfirmitionState Confirm(string? text = null); // Подтвердить пароль пользователя
+        /// <summary>
+        /// Database creating, if it isn't yet created
+        /// </summary>
+        void CreateDatabase();
+        /// <summary>
+        /// Correct existing password checking
+        /// </summary>
+        /// <param name="login"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        bool IsPasswordCorrect(string login, string password);
+        /// <summary>
+        /// Adding new user
+        /// </summary>
+        /// <param name="login"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        bool Add(string login, string password);
+        /// <summary>
+        /// User existing checking
+        /// </summary>
+        /// <param name="login"></param>
+        /// <returns></returns>
+        bool IsUserExists(string login);
+        /// <summary>
+        /// Deleting the user
+        /// </summary>
+        /// <param name="login"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        bool Delete(string login, string password);
+        /// <summary>
+        /// User password confirming
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        ConfirmitionState Confirm(string? text = null);
     }
 }
