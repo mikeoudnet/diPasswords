@@ -6,6 +6,12 @@ using diPasswords.Application.Interfaces;
 using diPasswords.Presentation.Managers;
 using diPasswords.Presentation.Views;
 using diPasswords.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using System.Diagnostics.Metrics;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.Extensions.Options;
 
 namespace diPasswords
 {
@@ -17,8 +23,10 @@ namespace diPasswords
         /// <param name="services"></param>
         private static void ConfigureServices(IServiceCollection services)
         {
+            string connectionString = "Server=(localdb)\\mssqllocaldb;Database=diPasswords;Trusted_Connection=True;";                        
+            services.AddDbContext<DataContext>(options => options.UseSqlServer(connectionString));
+
             services.AddSingleton<ILogger, Logger>();
-            services.AddSingleton<IDataBaseManager, DataBaseManager>();
             services.AddSingleton<IUserService, UserService>();
             services.AddSingleton<IValidator, Validator>();
             services.AddSingleton<IElementView, ElementView>();
@@ -40,7 +48,6 @@ namespace diPasswords
             ConfigureServices(services);
 
             using var provider = services.BuildServiceProvider();
-
             var form = provider.GetRequiredService<diPasswordsForm>();
             System.Windows.Forms.Application.Run(form);
         }

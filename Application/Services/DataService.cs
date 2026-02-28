@@ -1,6 +1,6 @@
 ﻿using diPasswords.Application.Interfaces;
 using diPasswords.Domain.Models;
-using Microsoft.Data.SqlClient;
+using diPasswords.Infrastructure.Data;
 
 namespace diPasswords.Application.Services
 {
@@ -10,13 +10,14 @@ namespace diPasswords.Application.Services
     {
         private string _baseLogin; // Current user
 
+        private DataContext _dataContext; // Database context keeping encrypted data of certain user
         private IDataBaseManager _dataBaseManager; // Collapsed databases requests
         private ILogger _logger; // Logging to separate element
         private IEncrypter _encrypter; // Data encrypting and decrypting
 
-        public DataService(IDataBaseManager dataBaseManager, ILogger logger, IEncrypter encrypter)
+        public DataService(DataContext dataContext, ILogger logger, IEncrypter encrypter)
         {
-            _dataBaseManager = dataBaseManager;
+            _dataContext = dataContext;
             _logger = logger;
             _encrypter = encrypter;
         }
@@ -30,17 +31,8 @@ namespace diPasswords.Application.Services
         {
             if (_baseLogin != null)
             {
-                _dataBaseManager.Request
-                (
-                    "USE diPasswords;" +
-                    "INSERT INTO passwords (baseLogin, name) " +
-                    "VALUES (@baseLogin, @name);",
-                    new Dictionary<string, object>()
-                    {
-                        { "@baseLogin", _baseLogin },
-                        { "@name", name }
-                    }
-                );                
+                _dataContext.Passwords.Add(new EncryptedData { BaseLogin = _baseLogin, Name = name });
+                _dataContext.SaveChanges();
 
                 this.EditData(name, favorite, login, password, email, phone, description);
             }
@@ -63,63 +55,37 @@ namespace diPasswords.Application.Services
 
                 _encrypter.SetIV(name);
                 EncryptedData enData = _encrypter.Code(data);
-                _dataBaseManager.Request
-                (
-                    "USE diPasswords;" +
-                    "UPDATE passwords SET " +
-                        "favorite = @favorite," +
-                        "login = @login," +
-                        "password = @password," +
-                        "email = @email," +
-                        "phone = @phone," +
-                        "description = @description " +
-                        "WHERE baseLogin = @baseLogin AND name = @name",
-                    new Dictionary<string, object>()
-                    {
-                        { "@baseLogin", _baseLogin },
-                        { "@name", enData.Name },
-                        { "@favorite", enData.Favorite },
-                        { "@login", enData.EncryptedLogin },
-                        { "@password", enData.EncryptedPassword },
-                        { "@email", enData.EncryptedEmail },
-                        { "@phone", enData.EncryptedPhone },
-                        { "@description", enData.EncryptedDescription }
-                    }
-                );
+                var dataToEdit = _dataContext.Passwords.FirstOrDefault(x => x.Name == name);
+                if (dataToEdit != null)
+                {
+                    dataToEdit.Favorite = enData.Favorite;
+                    dataToEdit.EncryptedLogin = enData.EncryptedLogin;
+                    dataToEdit.EncryptedPassword = enData.EncryptedPassword;
+                    dataToEdit.EncryptedEmail = enData.EncryptedEmail;
+                    dataToEdit.EncryptedPhone = enData.EncryptedPhone;
+                    dataToEdit.EncryptedDescription = enData.EncryptedDescription;
+
+                    _dataContext.SaveChanges();
+                }
             }
         }
         /// <inheritdoc cref="IDataService.DeleteData(string)"/>
         // Deleting the data
         public void DeleteData(string name)
         {
-            _dataBaseManager.Request
-            (
-                $"USE diPasswords;" +
-                $"DELETE FROM passwords WHERE baseLogin = @baseLogin AND name = @name;",
-                new Dictionary<string, object>
-                {
-                    { "@baseLogin", _baseLogin },
-                    { "@name", name }
-                }
-            );
+            EncryptedData dataToRemove = _dataContext.Passwords.Where(x => x.Name == name && x.BaseLogin == _baseLogin).ToList()[0];
+            _dataContext.Passwords.Remove(dataToRemove);
+            _dataContext.SaveChanges();
         }
         /// <inheritdoc cref="IDataService.GetData()"/>
+        // All user data getting
         public List<Data> GetData()
         {
-            List<EncryptedData> enDataList = _dataBaseManager.SelectData
-            (
-                $"USE diPasswords;" +
-                $"SELECT * FROM passwords WHERE baseLogin = @baseLogin ORDER BY favorite DESC, name ASC;",
-                new Dictionary<string, object>
-                {
-                    { "@baseLogin", _baseLogin }
-                }
-            );
-
-            if  (enDataList != null)
+            List<EncryptedData> enDataList = _dataContext.Passwords.OrderBy(x => x.Favorite).OrderBy(x => x.Name).ToList();
+            if (enDataList != null)
             {
                 List<Data> dataList = new List<Data>();
-                for (int i = 0; i < enDataList.Count(); i++) dataList.Add(_encrypter.Decode(enDataList[i]));
+                for (int i = 0; i < enDataList.Count; i++) dataList.Add(_encrypter.Decode(enDataList[i]));
 
                 return dataList;
             }
@@ -129,16 +95,7 @@ namespace diPasswords.Application.Services
         // All user data getting
         public Data GetSelectedData(string name)
         {
-            List<EncryptedData> enDataList = _dataBaseManager.SelectData
-            (
-                $"USE diPasswords;" +
-                $"SELECT * FROM passwords WHERE baseLogin = @baseLogin AND name = @name;",
-                new Dictionary<string, object>
-                {
-                    { "@baseLogin", _baseLogin },
-                    { "@name", name }
-                }
-            );
+            List<EncryptedData> enDataList = _dataContext.Passwords.Where(x => x.BaseLogin == _baseLogin && x.Name == name).ToList();
 
             List<Data> dataList = new List<Data>();
             for (int i = 0; i < enDataList.Count(); i++) dataList.Add(_encrypter.Decode(enDataList[i]));

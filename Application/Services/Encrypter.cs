@@ -1,5 +1,6 @@
 ﻿using diPasswords.Application.Interfaces;
 using diPasswords.Domain.Models;
+using diPasswords.Infrastructure.Data;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -11,7 +12,7 @@ namespace diPasswords.Application.Services
     {
         private byte[] _key = new byte[32]; // Key using non-hashing user password for encrypting
 
-        private IDataBaseManager _dataBaseManager; // Collapsed databases requests
+        private DataContext _dataContext; // Database context keeping encrypted data of certain user
 
         /// <summary>
         /// String encrypting by key and IV
@@ -60,9 +61,9 @@ namespace diPasswords.Application.Services
             }
         }
 
-        public Encrypter(IDataBaseManager dataBaseManager)
+        public Encrypter(DataContext dataContext)
         {
-            _dataBaseManager = dataBaseManager;
+            _dataContext = dataContext;
         }
 
         /// <inheritdoc cref="IEncrypter.PasswordToKey(string)"/>
@@ -83,32 +84,20 @@ namespace diPasswords.Application.Services
                 iv = aes.IV;
             }
 
-            _dataBaseManager.Request
-            (
-                "USE diPasswords;" +
-                "UPDATE passwords SET " +
-                    "iVector = @iVector " +
-                    "WHERE name = @name;",
-                new Dictionary<string, object>()
-                {
-                    { "@iVector", iv },
-                    { "@name", name }
-                }
-            );
+            var dataToEdit = _dataContext.Passwords.FirstOrDefault(x => x.Name == name);
+            if (dataToEdit != null)
+            {
+                dataToEdit.IVector = iv;
+
+                _dataContext.SaveChanges();
+            }
         }
         /// <inheritdoc cref="IEncrypter.Code(Data)"/>
         // Data model coding
         public EncryptedData Code(Data data)
         {
-            List<EncryptedData> findData = _dataBaseManager.SelectData
-            (
-                "USE diPasswords;" +
-                "SELECT * FROM passwords WHERE name = @name",
-                new Dictionary<string, object>()
-                {
-                    { "@name", data.Name }
-                }
-            );
+            List<EncryptedData> findData = _dataContext.Passwords.Where(x => x.Name == data.Name).ToList();
+
             byte[] iv = (findData == null) ? null : findData[0].IVector;
             if (findData != null)
             {
@@ -129,15 +118,8 @@ namespace diPasswords.Application.Services
         // Encrypted data model decoding
         public Data Decode(EncryptedData enData)
         {
-            List<EncryptedData> findData = _dataBaseManager.SelectData
-            (
-                "USE diPasswords;" +
-                "SELECT * FROM passwords WHERE name = @name",
-                new Dictionary<string, object>()
-                {
-                    { "@name", enData.Name }
-                }
-            );
+            List<EncryptedData> findData = _dataContext.Passwords.Where(x => x.Name == enData.Name).ToList();
+
             byte[] iv = (findData == null) ? null : findData[0].IVector;
             if (iv != null)
             {

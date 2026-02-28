@@ -7,16 +7,6 @@ namespace diPasswords.Application.Interfaces
     /// </summary>
     public interface IUserService
     {
-        /// <summary>
-        /// Database creating, if it isn't yet created
-        /// </summary>
-        void CreateDatabase();
-        /// <summary>
-        /// Correct existing password checking
-        /// </summary>
-        /// <param name="login"></param>
-        /// <param name="password"></param>
-        /// <returns></returns>
         bool IsPasswordCorrect(string login, string password);
         /// <summary>
         /// Adding new user

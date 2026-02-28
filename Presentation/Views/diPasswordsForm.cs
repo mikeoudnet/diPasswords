@@ -3,6 +3,7 @@ using diPasswords.Application.Interfaces;
 using diPasswords.Presentation.Managers;
 using diPasswords.Domain.Enums;
 using diPasswords.Presentation.Views;
+using Microsoft.EntityFrameworkCore;
 
 namespace diPasswords
 {
@@ -269,9 +270,6 @@ namespace diPasswords
             _dataListShower.OnListCursor += ListBoxFocus;
 
             _logger.Info("Programm start");
-
-            _userService.CreateDatabase(); // Creating database if this is first program start
-            _logger.Info("Data base connection is successful");
         }
 
         /// <summary>
