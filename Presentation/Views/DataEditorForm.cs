@@ -1,5 +1,6 @@
 ﻿using diPasswords.Application.Interfaces;
 using diPasswords.Presentation.Managers;
+using diPasswords.Domain.Models;
 
 namespace diPasswords.Presentation.Views
 {
@@ -14,12 +15,24 @@ namespace diPasswords.Presentation.Views
         private IDataService _dataService; // User data interaction
         private IDataListShower _dataListShower; // User data visualization
 
+        /// <summary>
+        /// Description length label updating
+        /// </summary>
+        private void ShowDescriptionLength()
+        {
+            int length = DescriptionTextBox.Text.Length;
+
+            if (length >= 100) DescriptionLengthLbl.Text = Convert.ToString(length) + "/200";
+            else if (length >= 10) DescriptionLengthLbl.Text = "0" + Convert.ToString(length) + "/200";
+            else DescriptionLengthLbl.Text = "00" + Convert.ToString(length) + "/200";
+        }
+
         // Element enabling by neccessary and their parameter edditing
         // Objects linking to appropriate element
         private IElementController<Control> _showPasswordController;
 
         public DataEditorForm(
-            string baseLogin,            
+            string baseLogin,
             ILogger logger,
             IDataValidator dataValidator,
             IDataService dataService,
@@ -29,7 +42,7 @@ namespace diPasswords.Presentation.Views
             InitializeComponent();
 
             // Dependencies injection
-            _baseLogin = baseLogin;            
+            _baseLogin = baseLogin;
             _logger = logger;
             _dataValidator = dataValidator;
             _dataService = dataService;
@@ -61,6 +74,9 @@ namespace diPasswords.Presentation.Views
                 EmailTextBox.Text = data.Email;
                 PhoneTextBox.Text = data.Phone;
                 DescriptionTextBox.Text = data.Description;
+
+                ShowDescriptionLength();
+                if (data.Favorite) SetFavoriteBttn.PerformClick();
             }
         }
 
@@ -199,45 +215,50 @@ namespace diPasswords.Presentation.Views
         }
 
         /// <summary>
+        /// TextChanged event on description TextBox
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DescriptionTextBox_TextChanged(object sender, EventArgs e) => ShowDescriptionLength();
+
+        /// <summary>
         /// Click event on "Accept" button
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void AcceptBttn_Click(object sender, EventArgs e)
         {
-            if (_existingData == null)
-            {
-                if (_dataValidator.IsNameUnique(_baseLogin, NameTextBox.Text) && _dataValidator.IsLoginAndPasswordNotEmpty(LoginTextBox.Text, PasswordTextBox.Text) && _dataValidator.IsEmailCorrect(EmailTextBox.Text) && _dataValidator.IsPhoneCorrect(PhoneTextBox.Text))
-                {
-                    _dataService.SetCurrentUser(_baseLogin);
-                    _dataService.AddData(
-                        NameTextBox.Text,
-                        _favorite,
-                        LoginTextBox.Text,
-                        PasswordTextBox.Text,
-                        EmailTextBox.Text,
-                        PhoneTextBox.Text,
-                        DescriptionTextBox.Text);
+            Data data = new Data();
+            data.BaseLogin = _baseLogin;
+            data.Name = NameTextBox.Text;
+            data.Favorite = _favorite;
+            data.Login = LoginTextBox.Text;
+            data.Password = PasswordTextBox.Text;
+            data.Email = EmailTextBox.Text;
+            data.Phone = PhoneTextBox.Text;
+            data.Description = DescriptionTextBox.Text;
 
-                    _logger.Info("Data is added");
-                    _dataListShower.UpdateList(_dataService.GetData());
-                    _dataListShower.SetDataCursor((!_favorite) ? NameTextBox.Text : "★ " + NameTextBox.Text);
-                    this.Close();
-                }
-            }
-            else
+            if (_dataValidator.IsLoginAndPasswordNotEmpty(LoginTextBox.Text, PasswordTextBox.Text) &&
+                _dataValidator.IsEmailCorrect(EmailTextBox.Text) &&
+                _dataValidator.IsPhoneCorrect(PhoneTextBox.Text))
             {
-                if (_dataValidator.IsLoginAndPasswordNotEmpty(LoginTextBox.Text, PasswordTextBox.Text) && _dataValidator.IsEmailCorrect(EmailTextBox.Text) && _dataValidator.IsPhoneCorrect(PhoneTextBox.Text))
+                if (_existingData == null)
+                {
+                    if (_dataValidator.IsNameUnique(_baseLogin, NameTextBox.Text))
+                    {
+                        _dataService.SetCurrentUser(_baseLogin);
+                        _dataService.AddData(data);
+
+                        _logger.Info("Data is added");
+                        _dataListShower.UpdateList(_dataService.GetData());
+                        _dataListShower.SetDataCursor((!_favorite) ? NameTextBox.Text : "★ " + NameTextBox.Text);
+                        this.Close();
+                    }
+                }
+                else
                 {
                     _dataService.SetCurrentUser(_baseLogin);
-                    _dataService.EditData(
-                        NameTextBox.Text,
-                        _favorite,
-                        LoginTextBox.Text,
-                        PasswordTextBox.Text,
-                        EmailTextBox.Text,
-                        PhoneTextBox.Text,
-                        DescriptionTextBox.Text);
+                    _dataService.EditData(data);
 
                     _logger.Info("Data is editted");
                     _dataListShower.UpdateList(_dataService.GetData());

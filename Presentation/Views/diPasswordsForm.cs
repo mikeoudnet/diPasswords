@@ -161,16 +161,19 @@ namespace diPasswords
             if (activate)
             {
                 string name = ConvertSelected();
-                Data data = _dataService.GetSelectedData(name);
+                if (name != "")
+                {
+                    Data data = _dataService.GetSelectedData(name);
 
-                DataNameLbl.Text = data.Name;
-                DataLoginTextBox.Text = data.Login;
-                DataPasswordTextBox.Text = data.Password;
-                DataEmailTextBox.Text = data.Email;
-                DataPhoneTextBox.Text = data.Phone;
-                DataDescriptionTextBox.Text = data.Description;
+                    DataNameLbl.Text = data.Name;
+                    DataLoginTextBox.Text = data.Login;
+                    DataPasswordTextBox.Text = data.Password;
+                    DataEmailTextBox.Text = data.Email;
+                    DataPhoneTextBox.Text = data.Phone;
+                    DataDescriptionTextBox.Text = data.Description;
 
-                _showDataController.Retext(true);
+                    _showDataController.Retext(true);
+                }
             }
             else
             {

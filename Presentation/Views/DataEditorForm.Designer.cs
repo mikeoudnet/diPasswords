@@ -45,6 +45,7 @@
             SetFavoriteBttn = new Button();
             AcceptBttn = new Button();
             ShowPasswordBttn = new Button();
+            DescriptionLengthLbl = new Label();
             SuspendLayout();
             // 
             // NameTextBox
@@ -157,6 +158,7 @@
             DescriptionTextBox.ScrollBars = ScrollBars.Vertical;
             DescriptionTextBox.Size = new Size(371, 101);
             DescriptionTextBox.TabIndex = 7;
+            DescriptionTextBox.TextChanged += DescriptionTextBox_TextChanged;
             DescriptionTextBox.KeyPress += DescriptionTextBox_KeyPress;
             // 
             // Neccessary1Lbl
@@ -212,11 +214,22 @@
             ShowPasswordBttn.UseVisualStyleBackColor = true;
             ShowPasswordBttn.Click += ShowPasswordBttn_Click;
             // 
+            // DescriptionLengthLbl
+            // 
+            DescriptionLengthLbl.AutoSize = true;
+            DescriptionLengthLbl.ForeColor = SystemColors.ControlDark;
+            DescriptionLengthLbl.Location = new Point(14, 233);
+            DescriptionLengthLbl.Name = "DescriptionLengthLbl";
+            DescriptionLengthLbl.Size = new Size(79, 25);
+            DescriptionLengthLbl.TabIndex = 14;
+            DescriptionLengthLbl.Text = "000/200";
+            // 
             // DataEditorForm
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(395, 403);
+            Controls.Add(DescriptionLengthLbl);
             Controls.Add(ShowPasswordBttn);
             Controls.Add(AcceptBttn);
             Controls.Add(SetFavoriteBttn);
@@ -262,5 +275,6 @@
         private Button SetFavoriteBttn;
         private Button AcceptBttn;
         private Button ShowPasswordBttn;
+        private Label DescriptionLengthLbl;
     }
 }

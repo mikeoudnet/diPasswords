@@ -4,7 +4,7 @@ using diPasswords.Domain.Models;
 namespace diPasswords.Infrastructure.Data
 {
     /// <summary>
-    /// Database context keeping encrypted data of certain user
+    /// Common database context
     /// </summary>
     public class DataContext : DbContext
     {

@@ -10,8 +10,7 @@ namespace diPasswords.Application.Services
     {
         private string _baseLogin; // Current user
 
-        private DataContext _dataContext; // Database context keeping encrypted data of certain user
-        private IDataBaseManager _dataBaseManager; // Collapsed databases requests
+        private DataContext _dataContext; // Common database context
         private ILogger _logger; // Logging to separate element
         private IEncrypter _encrypter; // Data encrypting and decrypting
 
@@ -27,35 +26,26 @@ namespace diPasswords.Application.Services
         public void SetCurrentUser(string baseLogin) => _baseLogin = baseLogin;
         /// <inheritdoc cref="IDataService.AddData(string, bool, string, string, string, string, string)"/>
         // Adding new data
-        public void AddData(string name, bool favorite, string login, string password, string email, string phone, string description)
+        public void AddData(Data data)
         {
             if (_baseLogin != null)
             {
-                _dataContext.Passwords.Add(new EncryptedData { BaseLogin = _baseLogin, Name = name });
+                _dataContext.Passwords.Add(new EncryptedData { BaseLogin = _baseLogin, Name = data.Name });
                 _dataContext.SaveChanges();
 
-                this.EditData(name, favorite, login, password, email, phone, description);
+                this.EditData(data);
             }
             else _logger.Fatal("It is unknown whats user add data");
         }
         /// <inheritdoc cref="IDataService.EditData(string, bool, string, string, string, string, string)"/>
         // Edditting current data
-        public void EditData(string name, bool favorite, string login, string password, string email, string phone, string description)
+        public void EditData(Data data)
         {
             if (_baseLogin != null)
             {
-                Data data = new Data();
-                data.Name = name;
-                data.Favorite = favorite;
-                data.Login = login;
-                data.Password = password;
-                data.Email = email;
-                data.Phone = phone;
-                data.Description = description;
-
-                _encrypter.SetIV(name);
+                _encrypter.SetIV(data.Name);
                 EncryptedData enData = _encrypter.Code(data);
-                var dataToEdit = _dataContext.Passwords.FirstOrDefault(x => x.Name == name);
+                var dataToEdit = _dataContext.Passwords.FirstOrDefault(x => x.Name == data.Name);
                 if (dataToEdit != null)
                 {
                     dataToEdit.Favorite = enData.Favorite;
@@ -81,7 +71,7 @@ namespace diPasswords.Application.Services
         // All user data getting
         public List<Data> GetData()
         {
-            List<EncryptedData> enDataList = _dataContext.Passwords.OrderBy(x => x.Favorite).OrderBy(x => x.Name).ToList();
+            List<EncryptedData> enDataList = _dataContext.Passwords.OrderByDescending(x => x.Favorite).ThenBy(x => x.Name).ToList();
             if (enDataList != null)
             {
                 List<Data> dataList = new List<Data>();
@@ -95,12 +85,11 @@ namespace diPasswords.Application.Services
         // All user data getting
         public Data GetSelectedData(string name)
         {
-            List<EncryptedData> enDataList = _dataContext.Passwords.Where(x => x.BaseLogin == _baseLogin && x.Name == name).ToList();
+            var enData = _dataContext.Passwords.FirstOrDefault(x => x.BaseLogin == _baseLogin && x.Name == name);
 
-            List<Data> dataList = new List<Data>();
-            for (int i = 0; i < enDataList.Count(); i++) dataList.Add(_encrypter.Decode(enDataList[i]));
+            Data data = _encrypter.Decode(enData);
 
-            return (dataList.Count > 0) ? dataList[0] : null;
+            return data;
         }
     }
 }

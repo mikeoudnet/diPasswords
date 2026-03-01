@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 using diPasswords.Infrastructure.Data;
 using diPasswords.Infrastructure.Logging;
 using diPasswords.Application.Services;
@@ -6,12 +7,6 @@ using diPasswords.Application.Interfaces;
 using diPasswords.Presentation.Managers;
 using diPasswords.Presentation.Views;
 using diPasswords.Infrastructure;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using System.Diagnostics.Metrics;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.Extensions.Options;
 
 namespace diPasswords
 {
@@ -25,6 +20,9 @@ namespace diPasswords
         {
             string connectionString = "Server=(localdb)\\mssqllocaldb;Database=diPasswords;Trusted_Connection=True;";                        
             services.AddDbContext<DataContext>(options => options.UseSqlServer(connectionString));
+
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IDataService, DataService>();
 
             services.AddSingleton<ILogger, Logger>();
             services.AddSingleton<IUserService, UserService>();
@@ -48,7 +46,9 @@ namespace diPasswords
             ConfigureServices(services);
 
             using var provider = services.BuildServiceProvider();
-            var form = provider.GetRequiredService<diPasswordsForm>();
+            var scope = provider.CreateScope();
+            var form = scope.ServiceProvider.GetRequiredService<diPasswordsForm>();
+
             System.Windows.Forms.Application.Run(form);
         }
     }

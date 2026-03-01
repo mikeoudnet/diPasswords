@@ -15,25 +15,13 @@ namespace diPasswords.Application.Interfaces
         /// <summary>
         /// Adding new data
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="favorite"></param>
-        /// <param name="login"></param>
-        /// <param name="password"></param>
-        /// <param name="email"></param>
-        /// <param name="phone"></param>
-        /// <param name="description"></param>
-        void AddData(string name, bool favorite, string login, string password, string email, string phone, string description);
+        /// <param name="data"></param>
+        void AddData(Data data);
         /// <summary>
-        /// Edditting current data
+        /// Editting current data
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="favorite"></param>
-        /// <param name="login"></param>
-        /// <param name="password"></param>
-        /// <param name="email"></param>
-        /// <param name="phone"></param>
-        /// <param name="description"></param>
-        void EditData(string name, bool favorite, string login, string password, string email, string phone, string description);
+        /// <param name="data"></param>
+        void EditData(Data data);
         /// <summary>
         /// Deleting the data
         /// </summary>

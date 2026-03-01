@@ -2,9 +2,6 @@
 using diPasswords.Domain.Enums;
 using diPasswords.Domain.Models;
 using diPasswords.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 
 namespace diPasswords.Application.Services
 {
@@ -14,7 +11,7 @@ namespace diPasswords.Application.Services
     {
         private string? _confirmer = null; // Password to confirm it
 
-        private DataContext _dataContext;
+        private DataContext _dataContext; // Common database context
 
         public UserService(DataContext dataContext)
         {

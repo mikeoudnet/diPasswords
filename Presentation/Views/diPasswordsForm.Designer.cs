@@ -399,7 +399,6 @@
         private Button DeleteDataBttn;
         private GroupBox SelectedDataBox;
         private ListView LoggerListView;
-        private Label label2;
         private Label PasswordLbl;
         private Label DataNameLbl;
         private TextBox DataPasswordTextBox;

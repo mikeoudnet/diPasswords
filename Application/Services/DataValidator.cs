@@ -1,4 +1,6 @@
 ﻿using diPasswords.Application.Interfaces;
+using diPasswords.Domain.Models;
+using diPasswords.Infrastructure.Data;
 using System.Text.RegularExpressions;
 
 namespace diPasswords.Application.Services
@@ -10,14 +12,14 @@ namespace diPasswords.Application.Services
         private readonly char[] _phoneSymbols = new char[] { '+', '-', '(', ')', ' ' }; // Acceptable symbols by phone number inputting
 
         private ILogger _logger; // Logging to separate element
-        private IDataBaseManager _dataBaseManager; // Collapsed databases requests
+        private DataContext _dataContext; // Common database context
 
         public DataValidator(
             ILogger logger,
-            IDataBaseManager dataBaseManager)
+            DataContext dataContext)
         {
             _logger = logger;
-            _dataBaseManager = dataBaseManager;
+            _dataContext = dataContext;
         }
 
         /// <inheritdoc cref="IDataValidator.IsNameUnique(string, string)"/>
@@ -38,19 +40,7 @@ namespace diPasswords.Application.Services
                     return false;
                 }
 
-                bool isNameExists = Convert.ToBoolean(_dataBaseManager.GetCount
-                (
-                    "USE diPasswords;" +
-                    "IF EXISTS (SELECT 1 FROM passwords WHERE baseLogin = @baseLogin AND name = @name)" +
-                        "SELECT 1" +
-                    "ELSE SELECT 0;",
-                    new Dictionary<string, object>
-                    {
-                        { "@baseLogin", baseLogin },
-                        { "@name", name }
-                    }
-                ));
-
+                bool isNameExists = _dataContext.Passwords.Any(x => x.BaseLogin == baseLogin && x.Name == name);
                 if (!isNameExists) return true;
                 else
                 {
